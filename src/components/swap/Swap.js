@@ -2,9 +2,27 @@ import React from 'react';
 import BNBLogo from '../../images/swap/btc.svg'
 import ReceiveLogo from '../../images/swap/receive.svg'
 import SwitchIcon from '../../images/swap/switch.svg'
+import checkwallet from './functions'
 import "./swap.scss"
 
-const Swap = () => {
+const Swap = (props) => {
+
+  React.useEffect(() => {
+    if (props?.chainId === 56) {
+      console.log("Props=>", props)
+    } else {
+      if (props.useraddress === "") {
+        alert("Please Connect Wallet");
+        return false;
+      } else {
+        alert("Please Switch to BSC to continue");
+        return false;
+      }
+
+    }
+  }, []);
+
+
   return (
     <div className='landing'>
       <div className='stak_box'>
