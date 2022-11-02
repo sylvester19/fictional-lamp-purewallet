@@ -30,14 +30,3 @@ export const ApproveFunction = async (walletaddress, amount) => {
     }
 }
 
-
-export const Tokenvalue = async (amount) => {
-    /* Step 4: Monitor the best exchange route */
-    let exchangerootendpoint = `https://api.1inch.exchange/v4.0/56/quote?fromTokenAddress=0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE&toTokenAddress=0xc3BcE47886e56316B2A5A4b2C926561AE94039A2&amount=10`
-    try {
-        const response = await axios.get(exchangerootendpoint);
-        console.log("Approval=>", response.data)
-    } catch (err) {
-        console.log("Error=>", err.message)
-    }
-}
