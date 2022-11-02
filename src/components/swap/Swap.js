@@ -11,6 +11,8 @@ const Swap = ({ useraddress, provider }) => {
 
   const [amount, setAmount] = React.useState("");
   const [receivingamount, setreceivingamount] = React.useState(0);
+  const [swaptokentwo, SwapTokentwo] = React.useState("none");
+  const [swaptokenone, SwapTokenone] = React.useState("");
   const [balancetoken, setBalanceToken] = React.useState(0);
   const [userbalance, setUserBalance] = React.useState(0);
   const [walletconnect, setWalletconnect] = React.useState(false);
@@ -36,7 +38,9 @@ const Swap = ({ useraddress, provider }) => {
     }
   }
 
+  const SwapToken = async () => {
 
+  }
 
   const Connectwallet = async () => {
     document.getElementById("walletconnect").click();
@@ -63,7 +67,7 @@ const Swap = ({ useraddress, provider }) => {
           <p>Convert your BNB to PURE or vice versa, Easiest and fastest way to
             convert your assets</p>
         </div>
-        <div className='stak_body'>
+        <div className='stak_body' id="section-one" style={{ display: `${swaptokenone}` }}>
           <div className="input1">
             <input placeholder='Enter Amount' value={amount}
               onChange={(e) => { setAmount(e.target.value); Tokenvalue(amount) }} className="form-field" type="text" />
@@ -71,7 +75,7 @@ const Swap = ({ useraddress, provider }) => {
               <img src={BNBLogo} alt="BNB Logo" width="100%" />
             </div>
           </div>
-          <div className="switciconlogo">
+          <div onClick={() => { SwapTokentwo(""); SwapTokenone("none") }} className="switciconlogo">
             <img src={SwitchIcon} alt="Switch Icon" />
           </div>
 
@@ -90,8 +94,38 @@ const Swap = ({ useraddress, provider }) => {
               <button type='submit' onClick={() => ApproveFunction(useraddress, amount)} className='swap-button'>SWAP</button>
             </div>
           ) : ("")}
+        </div>
+
+        <div className='stak_body' id="section-two" style={{ display: `${swaptokentwo}` }}>
+          <div className="input1">
+            <input placeholder='Enter Amount' value={amount}
+              onChange={(e) => { setAmount(e.target.value); Tokenvalue(amount) }} className="form-field" type="text" />
+            <div className='maxToken'>
+              <img src={ReceiveLogo} alt="Recever Logo" width="100%" />
+            </div>
+          </div>
+          <div onClick={() => { SwapTokentwo("none"); SwapTokenone("") }} className="switciconlogo">
+            <img src={SwitchIcon} alt="Switch Icon" />
+          </div>
+          <div className="input1">
+            <input placeholder='You Receive' value={receivingamount} className="form-field" type="text" />
+            <div className='maxToken'>
+              <img src={BNBLogo} alt="BNB Logo" width="100%" />
+            </div>
+          </div>
+          {walletconnect === false ? (
+            <div className="switciconlogo">
+              <button type='submit' onClick={Connectwallet} className='swap-button'>Connect Wallet</button>
+            </div>
+          ) : walletconnect === true ? (
+            <div className="switciconlogo">
+              <button type='submit' onClick={() => ApproveFunction(useraddress, amount)} className='swap-button'>SWAP</button>
+            </div>
+          ) : ("")}
 
         </div>
+
+
         {error && (
           <div className='error-message'>
             <center>{error}</center>
@@ -104,7 +138,7 @@ const Swap = ({ useraddress, provider }) => {
           <p>PURE/BNB Rate <span className='stack_value'>10000000 PURE/BNB</span></p>
         </div>
       </div>
-    </div>
+    </div >
 
   )
 }

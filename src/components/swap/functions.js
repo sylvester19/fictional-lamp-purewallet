@@ -1,5 +1,6 @@
 import axios from "axios"
 
+export const FetchToken = async (walletaddress) => { }
 
 export const SwapFunction = async (walletaddress) => {
     /* Step 1 : Lookup addresses of tokens you want to swap */
