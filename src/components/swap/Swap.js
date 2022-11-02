@@ -31,15 +31,16 @@ const Swap = ({ useraddress, provider }) => {
       setWalletconnect(false)
     } else {
       setWalletconnect(true)
-      let balance = await provider?.getBalance('0xC257Ee8ca00310727B02B07D0CbB11C5672e172a');
-      let userbalance = await provider?.getBalance('0x93686b29Eeacd6a28577dd95c0c9967Aa541ed83');
-      setBalanceToken(ethers.utils.formatEther(balance)); setUserBalance(ethers.utils.formatEther(userbalance))
+      // Get bnb balance
+      const balance = await provider.getBalance(useraddress);
+      const balanceformat = ethers.utils.formatEther(balance);
+      setUserBalance(balanceformat)
+      // Get token balance
+      const tokenbalance = await provider.getBalance("0x1e8150ea46e2a7fbb795459198fbb4b35715196c");
+      const tokenbalanceformat = ethers.utils.formatEther(tokenbalance);
+      setBalanceToken(tokenbalanceformat)
       await SwapFunction(useraddress)
     }
-  }
-
-  const SwapToken = async () => {
-
   }
 
   const Connectwallet = async () => {
@@ -48,15 +49,20 @@ const Swap = ({ useraddress, provider }) => {
 
 
   const Tokenvalue = async (amount) => {
-    /* Step 4: Monitor the best exchange route */
-    let exchangerootendpoint = `https://api.1inch.exchange/v4.0/56/quote?fromTokenAddress=0x242a1fF6eE06f2131B7924Cacb74c7F9E3a5edc9&toTokenAddress=0xc3BcE47886e56316B2A5A4b2C926561AE94039A2&amount=${amount}`
+    if (amount > userbalance) {
+      setError("Insufficient BNB balance")
+    }
+    else {
+    let amountconvert = ethers.utils.parseEther(amount);
+    let exchangerootendpoint = `https://api.1inch.exchange/v4.0/56/quote?fromTokenAddress=0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c&toTokenAddress=0xc3BcE47886e56316B2A5A4b2C926561AE94039A2&amount=${amountconvert}`
     try {
       const response = await axios.get(exchangerootendpoint);
-      console.log("Approval=>", response.data)
+      //console.log("Approval=>", response.data)
     } catch (exchangerootendpoint) {
       let error = exchangerootendpoint.response.data.description;
       setError(error)
     }
+  }
   }
 
   return (
