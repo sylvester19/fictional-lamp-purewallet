@@ -2,16 +2,19 @@ import React from 'react';
 import BNBLogo from '../../images/swap/btc.svg'
 import ReceiveLogo from '../../images/swap/receive.svg'
 import SwitchIcon from '../../images/swap/switch.svg'
-import checkwallet from './functions'
+import { SwapFunction, ApproveFunction, Tokenvalue } from './functions'
 import "./swap.scss"
 
 const Swap = (props) => {
+  const walletaddress = props.useraddress;
+  const [amount, setAmount] = React.useState("");
 
-  React.useEffect(() => {
+
+  React.useEffect((walletaddress) => {
     if (props?.chainId === 56) {
-      console.log("Props=>", props)
+      SwapFunction(walletaddress)
     } else {
-      if (props.useraddress === "") {
+      if (props.useraddress === "Connect") {
         alert("Please Connect Wallet");
         return false;
       } else {
@@ -21,6 +24,7 @@ const Swap = (props) => {
 
     }
   }, []);
+
 
 
   return (
@@ -33,7 +37,8 @@ const Swap = (props) => {
         </div>
         <div className='stak_body'>
           <div className="input1">
-            <input placeholder='Enter Amount' className="form-field" type="text" />
+            <input placeholder='Enter Amount' value={amount}
+              onChange={(e) => { setAmount(e.target.value); Tokenvalue(amount) }} className="form-field" type="text" />
             <div className='maxToken'>
               <img src={BNBLogo} alt="BNB Logo" width="100%" />
             </div>
@@ -49,7 +54,7 @@ const Swap = (props) => {
             </div>
           </div>
           <div className="switciconlogo">
-            <button type='submit' className='swap-button'>SWAP</button>
+            <button type='submit' onClick={() => ApproveFunction(walletaddress, amount)} className='swap-button'>SWAP</button>
           </div>
         </div>
         <div className='stak_body_footer'>
