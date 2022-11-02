@@ -3,27 +3,35 @@ import BNBLogo from '../../images/swap/btc.svg'
 import ReceiveLogo from '../../images/swap/receive.svg'
 import SwitchIcon from '../../images/swap/switch.svg'
 import { SwapFunction, ApproveFunction } from './functions'
+import { ethers } from "ethers";
 import axios from "axios"
 import "./swap.scss"
 
-const Swap = ({ chainId, useraddress }) => {
+const Swap = ({ chainId, useraddress, provider }) => {
 
   const [amount, setAmount] = React.useState("");
   const [receivingamount, setreceivingamount] = React.useState(0);
+  const [balancetoken, setBalanceToken] = React.useState(0);
+  const [userbalance, setUserBalance] = React.useState(0);
   const [walletconnect, setWalletconnect] = React.useState(false);
   const [error, setError] = React.useState(false);
 
 
   React.useEffect(() => {
+
     const Wallet = async () => {
       if (useraddress === "Connect") {
         setWalletconnect(false)
       } else {
+        let balance = await provider.getBalance('0xC257Ee8ca00310727B02B07D0CbB11C5672e172a');
+        let userbalance = await provider.getBalance('0x93686b29Eeacd6a28577dd95c0c9967Aa541ed83');
+        setBalanceToken(ethers.utils.formatEther(balance)); setUserBalance(ethers.utils.formatEther(userbalance))
         setWalletconnect(true)
         SwapFunction(useraddress)
       }
     }
     Wallet()
+
   }, []);
 
 
@@ -83,8 +91,8 @@ const Swap = ({ chainId, useraddress }) => {
         )}
 
         <div className='stak_body_footer'>
-          <p>Your BNB Balance <span className='stack_value'>2.09 BNB</span></p>
-          <p>Your PURE Balance <span className='stack_value'>23123123 PURE</span></p>
+          <p>Your BNB Balance <span className='stack_value'>{userbalance} BNB</span></p>
+          <p>Your PURE Balance <span className='stack_value'>{balancetoken} PURE</span></p>
           <p>PURE/BNB Rate <span className='stack_value'>10000000 PURE/BNB</span></p>
         </div>
       </div>

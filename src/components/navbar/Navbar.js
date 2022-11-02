@@ -104,6 +104,7 @@ export default function Navbar(props) {
       },
     });
 
+
   }, []);
 
   useEffect(() => {
@@ -134,7 +135,11 @@ export default function Navbar(props) {
       const provider = await web3ModalRef.current.connect();
       const web3Provider = new providers.Web3Provider(provider);
       const { chainId } = await web3Provider.getNetwork();
+      console.log("Provi=>", web3Provider.getBalance())
       console.log("ChainId: ", chainId); setChainid(chainId)
+
+
+
       // if (chainId !== 4) {
       //   alert("USE RINKEEBY NETWORK");
       //   throw new Error("Change network to Rinkeby");
@@ -378,7 +383,7 @@ export default function Navbar(props) {
                   <Calculator />
                 </TabPanel>
 
-              </div> : <Swap chainId={chainid} useraddress={walletAddress} />}
+              </div> : <Swap chainId={chainid} provider={_provider} useraddress={walletAddress} />}
 
 
           </Box>
