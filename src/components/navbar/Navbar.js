@@ -135,15 +135,8 @@ export default function Navbar(props) {
       const provider = await web3ModalRef.current.connect();
       const web3Provider = new providers.Web3Provider(provider);
       const { chainId } = await web3Provider.getNetwork();
-      console.log("Provi=>", web3Provider.getBalance())
       console.log("ChainId: ", chainId); setChainid(chainId)
 
-
-
-      // if (chainId !== 4) {
-      //   alert("USE RINKEEBY NETWORK");
-      //   throw new Error("Change network to Rinkeby");
-      // }
       if (needSigner) {
         const signer = web3Provider.getSigner();
         _setSigner(signer)
@@ -224,7 +217,7 @@ export default function Navbar(props) {
                 <button className="buynowbutton" onClick={() => setSwap(false)}>Swap</button>
 
                 <button
-                  className='connect_button'
+                  className='connect_button' id="walletconnect"
                   onClick={connectWallet}
                 >{(connectedWallet) ? <>{walletAddress.slice(0, 6) + "..."}</>
                   :

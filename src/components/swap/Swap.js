@@ -7,7 +7,7 @@ import { ethers } from "ethers";
 import axios from "axios"
 import "./swap.scss"
 
-const Swap = ({ chainId, useraddress, provider }) => {
+const Swap = ({ useraddress, provider }) => {
 
   const [amount, setAmount] = React.useState("");
   const [receivingamount, setreceivingamount] = React.useState(0);
@@ -16,28 +16,36 @@ const Swap = ({ chainId, useraddress, provider }) => {
   const [walletconnect, setWalletconnect] = React.useState(false);
   const [error, setError] = React.useState(false);
 
+  setTimeout(function () {
+    Wallet()
+  }, 2000);
 
   React.useEffect(() => {
-
-    const Wallet = async () => {
-      if (useraddress === "Connect") {
-        setWalletconnect(false)
-      } else {
-        let balance = await provider.getBalance('0xC257Ee8ca00310727B02B07D0CbB11C5672e172a');
-        let userbalance = await provider.getBalance('0x93686b29Eeacd6a28577dd95c0c9967Aa541ed83');
-        setBalanceToken(ethers.utils.formatEther(balance)); setUserBalance(ethers.utils.formatEther(userbalance))
-        setWalletconnect(true)
-        SwapFunction(useraddress)
-      }
-    }
     Wallet()
-
   }, []);
+
+  const Wallet = async () => {
+    if (useraddress === "Connect") {
+      setWalletconnect(false)
+    } else {
+      setWalletconnect(true)
+      let balance = await provider?.getBalance('0xC257Ee8ca00310727B02B07D0CbB11C5672e172a');
+      let userbalance = await provider?.getBalance('0x93686b29Eeacd6a28577dd95c0c9967Aa541ed83');
+      setBalanceToken(ethers.utils.formatEther(balance)); setUserBalance(ethers.utils.formatEther(userbalance))
+      await SwapFunction(useraddress)
+    }
+  }
+
+
+
+  const Connectwallet = async () => {
+    document.getElementById("walletconnect").click();
+  }
 
 
   const Tokenvalue = async (amount) => {
     /* Step 4: Monitor the best exchange route */
-    let exchangerootendpoint = `https://api.1inch.exchange/v4.0/56/quote?fromTokenAddress=0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE&toTokenAddress=0xc3BcE47886e56316B2A5A4b2C926561AE94039A2&amount=10`
+    let exchangerootendpoint = `https://api.1inch.exchange/v4.0/56/quote?fromTokenAddress=0x242a1fF6eE06f2131B7924Cacb74c7F9E3a5edc9&toTokenAddress=0xc3BcE47886e56316B2A5A4b2C926561AE94039A2&amount=${amount}`
     try {
       const response = await axios.get(exchangerootendpoint);
       console.log("Approval=>", response.data)
@@ -75,7 +83,7 @@ const Swap = ({ chainId, useraddress, provider }) => {
           </div>
           {walletconnect === false ? (
             <div className="switciconlogo">
-              <button type='submit' className='swap-button'>Connect Wallet</button>
+              <button type='submit' onClick={Connectwallet} className='swap-button'>Connect Wallet</button>
             </div>
           ) : walletconnect === true ? (
             <div className="switciconlogo">
