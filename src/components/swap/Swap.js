@@ -18,12 +18,10 @@ const Swap = ({ useraddress, provider }) => {
   const [walletconnect, setWalletconnect] = React.useState(false);
   const [error, setError] = React.useState(false);
 
-  setTimeout(function () {
-    Wallet()
-  }, 2000);
 
   React.useEffect(() => {
     Wallet()
+
   }, []);
 
   const Wallet = async () => {
@@ -47,12 +45,14 @@ const Swap = ({ useraddress, provider }) => {
   }
 
 
-  const Tokenvalue = async (amount) => {
+  const Tokenvalue = async (props) => {
     /* Step 4: Monitor the best exchange route */
-    let exchangerootendpoint = `https://api.1inch.exchange/v4.0/56/quote?fromTokenAddress=0x242a1fF6eE06f2131B7924Cacb74c7F9E3a5edc9&toTokenAddress=0xc3BcE47886e56316B2A5A4b2C926561AE94039A2&amount=${amount}`
+    console.log("Props=>", await props)
+    const prices = ethers.utils.parseUnits(props.toString(), 'ether')
+    let exchangerootendpoint = `https://api.1inch.exchange/v4.0/56/quote?fromTokenAddress=0x242a1fF6eE06f2131B7924Cacb74c7F9E3a5edc9&toTokenAddress=0xc3BcE47886e56316B2A5A4b2C926561AE94039A2&amount=${prices.toNumber()}`
     try {
       const response = await axios.get(exchangerootendpoint);
-      console.log("Approval=>", response.data)
+      console.log("Response=>", response.data)
     } catch (exchangerootendpoint) {
       let error = exchangerootendpoint.response.data.description;
       setError(error)
@@ -69,8 +69,8 @@ const Swap = ({ useraddress, provider }) => {
         </div>
         <div className='stak_body' id="section-one" style={{ display: `${swaptokenone}` }}>
           <div className="input1">
-            <input placeholder='Enter Amount' value={amount}
-              onChange={(e) => { setAmount(e.target.value); Tokenvalue(amount) }} className="form-field" type="text" />
+            <input placeholder='Enter Amount'
+              onChange={(e) => { setAmount(e.target.value); Tokenvalue(e.target.value) }} className="form-field" type="text" />
             <div className='maxToken'>
               <img src={BNBLogo} alt="BNB Logo" width="100%" />
             </div>
@@ -99,7 +99,7 @@ const Swap = ({ useraddress, provider }) => {
         <div className='stak_body' id="section-two" style={{ display: `${swaptokentwo}` }}>
           <div className="input1">
             <input placeholder='Enter Amount' value={amount}
-              onChange={(e) => { setAmount(e.target.value); Tokenvalue(amount) }} className="form-field" type="text" />
+              onChange={(e) => { Tokenvalue(e.target.value) }} className="form-field" type="text" />
             <div className='maxToken'>
               <img src={ReceiveLogo} alt="Recever Logo" width="100%" />
             </div>
