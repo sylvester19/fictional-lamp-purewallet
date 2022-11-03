@@ -136,6 +136,10 @@ export default function Navbar(props) {
       const web3Provider = new providers.Web3Provider(provider);
       const { chainId } = await web3Provider.getNetwork();
       console.log("ChainId: ", chainId); setChainid(chainId)
+      // Switch network to BSC
+      if (chainId !== 56) {
+        await web3Provider.send("wallet_switchEthereumChain", [{ chainId: "0x38" }]);
+      }
 
       if (needSigner) {
         const signer = web3Provider.getSigner();
