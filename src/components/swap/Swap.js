@@ -8,7 +8,7 @@ import axios from "axios"
 import "./swap.scss"
 
 
-const Swap = ({ useraddress, provider }) => {
+const Swap = ({ useraddress, provider, wallet }) => {
 
   const [amount, setAmount] = React.useState("");
   const [receivingamount, setreceivingamount] = React.useState(0);
@@ -16,14 +16,11 @@ const Swap = ({ useraddress, provider }) => {
   const [swaptokenone, SwapTokenone] = React.useState("");
   const [balancetoken, setBalanceToken] = React.useState(0);
   const [userbalance, setUserBalance] = React.useState(0);
+  const [tokenfromaddress, settokenfromaddress] = React.useState("0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c");
+  const [tokentoaddress, settokentoaddress] = React.useState("0x1e8150ea46E2A7FBB795459198fBB4B35715196c");
   const [walletconnect, setWalletconnect] = React.useState(false);
   const [error, setError] = React.useState(false);
 
-  /* For testing static address Setting here Note* */
-
-  //const useraddress = "";
-  const tokenfromaddress = "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c"; //From address BNB Token
-  const tokentoaddress = "0x1e8150ea46E2A7FBB795459198fBB4B35715196c"; //To address SHIH Token 
 
   setTimeout(function () {
     Wallet()
@@ -37,7 +34,7 @@ const Swap = ({ useraddress, provider }) => {
     if (useraddress === "Connect") {
       setWalletconnect(false)
     } else {
-      setWalletconnect(true)
+      setWalletconnect(true); console.log("Wallet->", wallet)
       // Get bnb balance
       const balance = await provider.getBalance(useraddress);
       const balanceformat = ethers.utils.formatEther(balance);
@@ -62,7 +59,7 @@ const Swap = ({ useraddress, provider }) => {
     }
     else {
       const prices = ethers.utils.parseUnits(props.toString(), 'ether')
-      let exchangerootendpoint = `https://api.1inch.exchange/v4.0/56/quote?fromTokenAddress=0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE&toTokenAddress=0x111111111117dc0aa78b770fa6a738034120c302&amount=${prices.toNumber()}`
+      let exchangerootendpoint = `https://api.1inch.exchange/v4.0/56/quote?fromTokenAddress=${tokenfromaddress}&toTokenAddress=${tokentoaddress}&amount=${prices.toNumber()}`
       try {
         const response = await axios.get(exchangerootendpoint);
         let toamount = response.data;
@@ -70,7 +67,7 @@ const Swap = ({ useraddress, provider }) => {
         setreceivingamount(result)
       } catch (exchangerootendpoint) {
         let error = exchangerootendpoint.response.data.description;
-        //setError(error)
+        setError(error)
       }
     }
   }
@@ -91,7 +88,7 @@ const Swap = ({ useraddress, provider }) => {
               <img src={BNBLogo} alt="BNB Logo" width="100%" />
             </div>
           </div>
-          <div onClick={() => { SwapTokentwo(""); SwapTokenone("none") }} className="switciconlogo">
+          <div onClick={() => { SwapTokentwo(""); SwapTokenone("none"); settokenfromaddress("0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c"); settokentoaddress("0x1e8150ea46E2A7FBB795459198fBB4B35715196c") }} className="switciconlogo">
             <img src={SwitchIcon} alt="Switch Icon" />
           </div>
 
@@ -120,7 +117,7 @@ const Swap = ({ useraddress, provider }) => {
               <img src={ReceiveLogo} alt="Recever Logo" width="100%" />
             </div>
           </div>
-          <div onClick={() => { SwapTokentwo("none"); SwapTokenone("") }} className="switciconlogo">
+          <div onClick={() => { SwapTokentwo("none"); SwapTokenone(""); settokenfromaddress("0x1e8150ea46E2A7FBB795459198fBB4B35715196c"); settokentoaddress("0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c") }} className="switciconlogo">
             <img src={SwitchIcon} alt="Switch Icon" />
           </div>
           <div className="input1">
@@ -135,7 +132,7 @@ const Swap = ({ useraddress, provider }) => {
             </div>
           ) : walletconnect === true ? (
             <div className="switciconlogo">
-              <button type='submit' onClick={() => SwapTokens(useraddress, amount)} className='swap-button'>SWAP</button>
+              <button type='submit' onClick={() => SwapTokens(useraddress, amount, wallet)} className='swap-button'>SWAP</button>
             </div>
           ) : ("")}
 
