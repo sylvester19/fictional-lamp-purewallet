@@ -25,8 +25,8 @@ export const CheckAllowance = async (walletaddress, tokentoaddress) => {
 
 export const ApproveFunction = async (amount, tokentoaddress) => {
     /* Step 3 : If necessary, give approval for 1inch router to spend source token */
-    //const prices = ethers.utils.parseUnits(price.toString(), 'ether')
-    let approvalendpoint = `https://api.1inch.exchange/v4.0/56/approve/transaction?tokenAddress=${tokentoaddress}&amount=${amount.toString()}`
+    const prices = ethers.utils.parseUnits(price.toString(), 'ether')
+    let approvalendpoint = `https://api.1inch.exchange/v4.0/56/approve/transaction?tokenAddress=${tokentoaddress}&amount=${prices.toNumber()}`
     try {
         const response = await axios.get(approvalendpoint);
         //console.log("Approval=>", response.data)
