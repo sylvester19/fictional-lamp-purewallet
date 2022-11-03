@@ -20,9 +20,10 @@ const Swap = ({ useraddress, provider }) => {
   const [error, setError] = React.useState(false);
 
   /* For testing static address Setting here Note* */
-  //const useraddress = "0x3c1F3021eC9372b81F9F3c130067eF88e3e96f6d";
-  const tokenfromaddress = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"; //From address BSC
-  const tokentoaddress = "0x1e8150ea46E2A7FBB795459198fBB4B35715196c"; //To address
+
+  //const useraddress = "";
+  const tokenfromaddress = "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c"; //From address BNB Token
+  const tokentoaddress = "0x1e8150ea46E2A7FBB795459198fBB4B35715196c"; //To address SHIH Token 
 
   setTimeout(function () {
     Wallet()
