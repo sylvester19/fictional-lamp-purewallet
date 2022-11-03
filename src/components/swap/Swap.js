@@ -4,9 +4,9 @@ import ReceiveLogo from '../../images/swap/receive.svg'
 import SwitchIcon from '../../images/swap/switch.svg'
 import { CheckAllowance, ApproveFunction, SwapTokens } from './functions'
 import { ethers } from "ethers";
-import axios from "axios"
 import "./swap.scss"
-
+const ERC20_ABI = [{ 'constant': true, 'inputs': [{ 'name': '_owner', 'type': 'address' }], 'name': 'balanceOf', 'outputs': [{ 'name': 'balance', 'type': 'uint256' }], 'payable': false, 'type': 'function' }];
+const SINGLE_CALL_BALANCES_ADDRESS = '0xb1f8e55c7f64d203c1400b9d8555d050f94adf39'
 
 const Swap = ({ useraddress, provider, wallet }) => {
 
@@ -28,18 +28,25 @@ const Swap = ({ useraddress, provider, wallet }) => {
 
   React.useEffect(() => {
     Wallet()
+    let fetchbalance = new ethers.Contract(
+      SINGLE_CALL_BALANCES_ADDRESS,
+      ERC20_ABI,
+      provider
+    );
+    console.log("Fetch Baa=>", fetchbalance)
   }, []);
 
   const Wallet = async () => {
     if (useraddress === "Connect") {
       setWalletconnect(false)
     } else {
-      setWalletconnect(true); console.log("Wallet->", wallet)
+      setWalletconnect(true);
       // Get bnb balance
       const balance = await provider.getBalance(useraddress);
       const balanceformat = ethers.utils.formatEther(balance);
       setUserBalance(balanceformat)
       // Get token balance
+
       const tokenbalance = await provider.getBalance(tokentoaddress);
       const tokenbalanceformat = ethers.utils.formatEther(tokenbalance);
       setBalanceToken(tokenbalanceformat)
@@ -54,23 +61,36 @@ const Swap = ({ useraddress, provider, wallet }) => {
 
 
   const Tokenvalue = async (props) => {
-    if (amount > userbalance) {
-      setError("Insufficient BNB balance")
+    // if (amount > userbalance) {
+    //   setError("Insufficient BNB balance")
+    // }
+    // else {
+    //const prices = ethers.utils.parseUnits(props.toString(), 'ether')
+    try {
+      const url = `${process.env.REACT_APP_CORUS_URL}` + `${process.env.REACT_APP_COINMARKET_ENDPOINT}?amount=1&symbol=SHIH`;
+      fetch(url, {
+        method: "GET",
+        withCredentials: true,
+        headers: {
+          "X-CMC_PRO_API_KEY": "79da1075-a7f3-495e-8285-774af970f7bc",
+          "Content-Type": "application/json",
+          "X-Requested-With": "XMLHttpRequest"
+        }
+      })
+        .then(resp => resp.json())
+        .then(function (data) {
+          let onetoken = data.data[0].quote.USD.price;
+          let total = props / onetoken;
+          setreceivingamount(total)
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+    } catch (exchangerootendpoint) {
+      let error = exchangerootendpoint.response.data.description;
+      //setError(error)
     }
-    else {
-      const prices = ethers.utils.parseUnits(props.toString(), 'ether')
-      let exchangerootendpoint = `https://api.1inch.exchange/v4.0/56/quote?fromTokenAddress=${tokenfromaddress}&toTokenAddress=${tokentoaddress}&amount=${prices.toNumber()}`
-      try {
-        const response = await axios.get(exchangerootendpoint);
-        let toamount = response.data;
-        let amountformat = ethers.utils.formatEther(toamount.toTokenAmount);
-        let result = Math.round(amountformat);
-        setreceivingamount(result)
-      } catch (exchangerootendpoint) {
-        let error = exchangerootendpoint.response.data.description;
-        setError(error)
-      }
-    }
+    // }
   }
 
   return (
@@ -89,7 +109,7 @@ const Swap = ({ useraddress, provider, wallet }) => {
               <img src={BNBLogo} alt="BNB Logo" width="100%" />
             </div>
           </div>
-          <div onClick={() => { SwapTokentwo(""); SwapTokenone("none"); settokenfromaddress("0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c"); settokentoaddress("0x1e8150ea46E2A7FBB795459198fBB4B35715196c") }} className="switciconlogo">
+          <div onClick={() => { setreceivingamount(""); setAmount(""); SwapTokentwo(""); SwapTokenone("none"); settokenfromaddress("0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c"); settokentoaddress("0x1e8150ea46E2A7FBB795459198fBB4B35715196c") }} className="switciconlogo">
             <img src={SwitchIcon} alt="Switch Icon" />
           </div>
 
@@ -118,7 +138,7 @@ const Swap = ({ useraddress, provider, wallet }) => {
               <img src={ReceiveLogo} alt="Recever Logo" width="100%" />
             </div>
           </div>
-          <div onClick={() => { SwapTokentwo("none"); SwapTokenone(""); settokenfromaddress("0x1e8150ea46E2A7FBB795459198fBB4B35715196c"); settokentoaddress("0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c") }} className="switciconlogo">
+          <div onClick={() => { setreceivingamount(""); setAmount(""); SwapTokentwo("none"); SwapTokenone(""); settokenfromaddress("0x1e8150ea46E2A7FBB795459198fBB4B35715196c"); settokentoaddress("0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c") }} className="switciconlogo">
             <img src={SwitchIcon} alt="Switch Icon" />
           </div>
           <div className="input1">
