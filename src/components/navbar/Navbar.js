@@ -76,7 +76,7 @@ const navigation = [
 export default function Navbar(props) {
 
   let [address, setAddress] = useState("Connect");
-  let [active, setActive] = useState("active_logout");
+  let [walletname, setWalletname] = useState("active_logout");
 
   let [connectedWallet, setConnectedWallet] = React.useState(false);
   let [walletAddress, setWalletAddress] = React.useState("Connect");
@@ -134,6 +134,9 @@ export default function Navbar(props) {
       _setProvider(_provider);
       const provider = await web3ModalRef.current.connect();
       const web3Provider = new providers.Web3Provider(provider);
+
+      console.log("Prov->", web3Provider)
+      setWalletname(web3Provider.connection.url)
       const { chainId } = await web3Provider.getNetwork();
       console.log("ChainId: ", chainId); setChainid(chainId)
       // Switch network to BSC
@@ -177,7 +180,6 @@ export default function Navbar(props) {
     }
   }
 
-  console.log("Address=>", walletAddress)
 
   return (
     <Disclosure as="nav" className="bg-[#000]">
@@ -380,7 +382,7 @@ export default function Navbar(props) {
                   <Calculator />
                 </TabPanel>
 
-              </div> : <Swap chainId={chainid} provider={_provider} useraddress={walletAddress} />}
+              </div> : <Swap chainId={chainid} wallet={walletname} provider={_provider} useraddress={walletAddress} />}
 
 
           </Box>
