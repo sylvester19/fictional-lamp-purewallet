@@ -140,7 +140,6 @@ export default function Navbar(props) {
       if (chainId !== 56) {
         await web3Provider.send("wallet_switchEthereumChain", [{ chainId: "0x38" }]);
       }
-
       if (needSigner) {
         const signer = web3Provider.getSigner();
         _setSigner(signer)
@@ -173,11 +172,12 @@ export default function Navbar(props) {
       window.localStorage.clear();
       setConnectedWallet(false);
       setWalletAddress('Connect')
-
     } catch (err) {
       console.log(err);
     }
   }
+
+  console.log("Address=>", walletAddress)
 
   return (
     <Disclosure as="nav" className="bg-[#000]">

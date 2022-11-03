@@ -2,10 +2,11 @@ import React from 'react';
 import BNBLogo from '../../images/swap/btc.svg'
 import ReceiveLogo from '../../images/swap/receive.svg'
 import SwitchIcon from '../../images/swap/switch.svg'
-import { SwapFunction, ApproveFunction } from './functions'
+import { CheckAllowance, ApproveFunction, SwapTokens } from './functions'
 import { ethers } from "ethers";
 import axios from "axios"
 import "./swap.scss"
+
 
 const Swap = ({ useraddress, provider }) => {
 
@@ -18,10 +19,17 @@ const Swap = ({ useraddress, provider }) => {
   const [walletconnect, setWalletconnect] = React.useState(false);
   const [error, setError] = React.useState(false);
 
+  /* For testing static address Setting here Note* */
+  //const useraddress = "0x3c1F3021eC9372b81F9F3c130067eF88e3e96f6d";
+  const tokenfromaddress = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"; //From address BSC
+  const tokentoaddress = "0x111111111117dc0aa78b770fa6a738034120c302"; //To address 1INCH
+
+  setTimeout(function () {
+    Wallet()
+  }, 2000);
 
   React.useEffect(() => {
     Wallet()
-
   }, []);
 
   const Wallet = async () => {
@@ -34,31 +42,34 @@ const Swap = ({ useraddress, provider }) => {
       const balanceformat = ethers.utils.formatEther(balance);
       setUserBalance(balanceformat)
       // Get token balance
-      const tokenbalance = await provider.getBalance("0x1e8150ea46e2a7fbb795459198fbb4b35715196c");
+      const tokenbalance = await provider.getBalance(tokentoaddress);
       const tokenbalanceformat = ethers.utils.formatEther(tokenbalance);
       setBalanceToken(tokenbalanceformat)
-      await SwapFunction(useraddress)
+      await CheckAllowance(useraddress, tokentoaddress)
     }
   }
+
 
   const Connectwallet = async () => {
     document.getElementById("walletconnect").click();
   }
 
 
-  const Tokenvalue = async (amount) => {
+  const Tokenvalue = async (props) => {
     if (amount > userbalance) {
       setError("Insufficient BNB balance")
     }
     else {
-      let amountconvert = ethers.utils.parseEther(amount);
-      let exchangerootendpoint = `https://api.1inch.exchange/v4.0/56/quote?fromTokenAddress=0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c&toTokenAddress=0xc3BcE47886e56316B2A5A4b2C926561AE94039A2&amount=${amountconvert}`
+      const prices = ethers.utils.parseUnits(props.toString(), 'ether')
+      let exchangerootendpoint = `https://api.1inch.exchange/v4.0/56/quote?fromTokenAddress=0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE&toTokenAddress=0x111111111117dc0aa78b770fa6a738034120c302&amount=${prices.toNumber()}`
       try {
         const response = await axios.get(exchangerootendpoint);
-        //console.log("Approval=>", response.data)
+        let toamount = response.data;
+        let result = toamount?.toTokenAmount;
+        setreceivingamount(result)
       } catch (exchangerootendpoint) {
         let error = exchangerootendpoint.response.data.description;
-        setError(error)
+        //setError(error)
       }
     }
   }
@@ -95,7 +106,7 @@ const Swap = ({ useraddress, provider }) => {
             </div>
           ) : walletconnect === true ? (
             <div className="switciconlogo">
-              <button type='submit' onClick={() => ApproveFunction(useraddress, amount)} className='swap-button'>SWAP</button>
+              <button type='submit' onClick={() => SwapTokens(useraddress, amount, tokenfromaddress, tokentoaddress)} className='swap-button'>SWAP</button>
             </div>
           ) : ("")}
         </div>
@@ -123,7 +134,7 @@ const Swap = ({ useraddress, provider }) => {
             </div>
           ) : walletconnect === true ? (
             <div className="switciconlogo">
-              <button type='submit' onClick={() => ApproveFunction(useraddress, amount)} className='swap-button'>SWAP</button>
+              <button type='submit' onClick={() => SwapTokens(useraddress, amount)} className='swap-button'>SWAP</button>
             </div>
           ) : ("")}
 
