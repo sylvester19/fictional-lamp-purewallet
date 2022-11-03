@@ -40,6 +40,29 @@ export const SwapTokens = async (walletaddress, amount, tokenfromaddress, tokent
     try {
         const response = await axios.get(swapfunction);
         console.log("Swap Funvtion =>", response.data)
+        const sendmetamask = response.data;
+        try {
+            const { ethereum } = window;
+            await ethereum.request({ method: "eth_requestAccounts" });
+            const accounts = await ethereum.request({ method: "eth_accounts" });
+            const chainId = await ethereum.request({ method: "eth_chainId" });
+            sendmetamask.from = accounts[0];
+            sendmetamask.gasPrice = "2000000000";
+            try {
+                const transaction = await window.ethereum.request({
+                    method: "eth_sendTransaction",
+                    params: [sendmetamask],
+                });
+                console.log('Response Meta=>', transaction);
+
+            } catch (error) {
+                console.log("Error=>", error)
+            }
+        }
+        catch (error) {
+            console.log("Error=>", error)
+        }
+
     } catch (err) {
         console.log("Error=>", err.message)
     }
