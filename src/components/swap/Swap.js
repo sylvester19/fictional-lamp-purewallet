@@ -22,6 +22,8 @@ const Swap = ({ useraddress, provider, wallet }) => {
   const [error, setError] = React.useState(false);
 
 
+
+
   setTimeout(function () {
     Wallet()
   }, 2000);
@@ -132,7 +134,7 @@ const Swap = ({ useraddress, provider, wallet }) => {
 
         <div className='stak_body' id="section-two" style={{ display: `${swaptokentwo}` }}>
           <div className="input1">
-            <input placeholder='Enter Amount' value={amount}
+            <input placeholder='Enter Amount'
               onChange={(e) => { Tokenvalue(e.target.value) }} className="form-field" type="text" />
             <div className='maxToken'>
               <img src={ReceiveLogo} alt="Recever Logo" width="100%" />

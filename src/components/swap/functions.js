@@ -99,7 +99,7 @@ export const ApproveFunction = async (amount, tokentoaddress, wallet, walletaddr
 
 export const SwapTokens = async (walletaddress, amount, tokenfromaddress, tokentoaddress, wallet) => {
     /* Step 5 : All Success ready use to perform swap */
-    await ApproveFunction(amount, tokentoaddress, wallet, walletaddress)
+    // await ApproveFunction(amount, tokentoaddress, wallet, walletaddress)
     const prices = ethers.utils.parseUnits(amount.toString(), 'ether')
     let swapfunction = `https://api.1inch.exchange/v4.0/56/swap?fromTokenAddress=${tokenfromaddress}&toTokenAddress=${tokentoaddress}&amount=${prices.toNumber()}&fromAddress=${walletaddress}&slippage=1&gasLimit=11500000&gasPrice=20000`;
     let response = await axios.get(swapfunction);
