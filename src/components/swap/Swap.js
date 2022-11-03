@@ -22,7 +22,7 @@ const Swap = ({ useraddress, provider }) => {
   /* For testing static address Setting here Note* */
   //const useraddress = "0x3c1F3021eC9372b81F9F3c130067eF88e3e96f6d";
   const tokenfromaddress = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"; //From address BSC
-  const tokentoaddress = "0x111111111117dc0aa78b770fa6a738034120c302"; //To address 1INCH
+  const tokentoaddress = "0x1e8150ea46E2A7FBB795459198fBB4B35715196c"; //To address
 
   setTimeout(function () {
     Wallet()
