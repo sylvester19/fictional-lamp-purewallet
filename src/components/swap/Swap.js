@@ -3,10 +3,10 @@ import BNBLogo from '../../images/swap/btc.svg'
 import ReceiveLogo from '../../images/swap/receive.svg'
 import SwitchIcon from '../../images/swap/switch.svg'
 import { CheckAllowance, ApproveFunction, SwapTokens } from './functions'
+import axios from "axios";
 import { ethers } from "ethers";
 import "./swap.scss"
-const ERC20_ABI = [{ 'constant': true, 'inputs': [{ 'name': '_owner', 'type': 'address' }], 'name': 'balanceOf', 'outputs': [{ 'name': 'balance', 'type': 'uint256' }], 'payable': false, 'type': 'function' }];
-const SINGLE_CALL_BALANCES_ADDRESS = '0xb1f8e55c7f64d203c1400b9d8555d050f94adf39'
+
 
 const Swap = ({ useraddress, provider, wallet }) => {
 
@@ -28,28 +28,29 @@ const Swap = ({ useraddress, provider, wallet }) => {
 
   React.useEffect(() => {
     Wallet()
-    let fetchbalance = new ethers.Contract(
-      SINGLE_CALL_BALANCES_ADDRESS,
-      ERC20_ABI,
-      provider
-    );
-    console.log("Fetch Baa=>", fetchbalance)
+
   }, []);
 
   const Wallet = async () => {
     if (useraddress === "Connect") {
       setWalletconnect(false)
     } else {
-      setWalletconnect(true);
+
       // Get bnb balance
       const balance = await provider.getBalance(useraddress);
       const balanceformat = ethers.utils.formatEther(balance);
-      setUserBalance(balanceformat)
-      // Get token balance
 
-      const tokenbalance = await provider.getBalance(tokentoaddress);
-      const tokenbalanceformat = ethers.utils.formatEther(tokenbalance);
-      setBalanceToken(tokenbalanceformat)
+      /*Function to Get BEP-20 Token Account Balance by ContractAddress */
+      let balanceendpoint = `https://api.bscscan.com/api?module=account&action=tokenbalance&contractaddress=${tokenfromaddress}&address=${useraddress}&tag=latest&apikey=SDVCH48GXWPXJEGA6J3J3UNRUV6JH997ZK`
+      try {
+        const response = await axios.get(balanceendpoint);
+        const balanceformat = ethers.utils.formatEther(response.data.result);
+        setBalanceToken(Math.round(balanceformat))
+      } catch (err) {
+        console.log("Error=>", err.message)
+      }
+      setWalletconnect(true);
+      setUserBalance(balanceformat)
       await CheckAllowance(useraddress, tokentoaddress)
     }
   }
