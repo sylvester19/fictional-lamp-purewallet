@@ -62,36 +62,35 @@ const Swap = ({ useraddress, provider, wallet }) => {
 
 
   const Tokenvalue = async (props) => {
-    // if (amount > userbalance) {
-    //   setError("Insufficient BNB balance")
-    // }
-    // else {
-    //const prices = ethers.utils.parseUnits(props.toString(), 'ether')
-    try {
-      const url = `${process.env.REACT_APP_CORUS_URL}` + `${process.env.REACT_APP_COINMARKET_ENDPOINT}?amount=1&symbol=SHIH`;
-      fetch(url, {
-        method: "GET",
-        withCredentials: true,
-        headers: {
-          "X-CMC_PRO_API_KEY": "79da1075-a7f3-495e-8285-774af970f7bc",
-          "Content-Type": "application/json",
-          "X-Requested-With": "XMLHttpRequest"
-        }
-      })
-        .then(resp => resp.json())
-        .then(function (data) {
-          let onetoken = data.data[0].quote.USD.price;
-          let total = props / onetoken;
-          setreceivingamount(total)
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
-    } catch (exchangerootendpoint) {
-      let error = exchangerootendpoint.response.data.description;
-      //setError(error)
+    if (amount > userbalance) {
+      setError("Insufficient BNB balance")
     }
-    // }
+    else {
+      try {
+        const url = `${process.env.REACT_APP_CORUS_URL}` + `${process.env.REACT_APP_COINMARKET_ENDPOINT}?amount=1&symbol=SHIH`;
+        fetch(url, {
+          method: "GET",
+          withCredentials: true,
+          headers: {
+            "X-CMC_PRO_API_KEY": "79da1075-a7f3-495e-8285-774af970f7bc",
+            "Content-Type": "application/json",
+            "X-Requested-With": "XMLHttpRequest"
+          }
+        })
+          .then(resp => resp.json())
+          .then(function (data) {
+            let onetoken = data.data[0].quote.USD.price;
+            let total = props / onetoken;
+            setreceivingamount(total)
+          })
+          .catch(function (error) {
+            console.log(error);
+          });
+      } catch (exchangerootendpoint) {
+        let error = exchangerootendpoint.response.data.description;
+        setError(error)
+      }
+    }
   }
 
   return (
