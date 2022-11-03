@@ -61,12 +61,13 @@ const Swap = ({ useraddress, provider }) => {
       setError("Insufficient BNB balance")
     }
     else {
-      const prices = ethers.utils.parseUnits(props.toString(), 'ether')
-      let exchangerootendpoint = `https://api.1inch.exchange/v4.0/56/quote?fromTokenAddress=0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE&toTokenAddress=0x111111111117dc0aa78b770fa6a738034120c302&amount=${prices.toNumber()}`
+      const prices = ethers.utils.parseEther(amount).toString();  
+      let exchangerootendpoint = `https://api.1inch.exchange/v4.0/56/quote?fromTokenAddress=0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c&toTokenAddress=0x1e8150ea46e2a7fbb795459198fbb4b35715196c&amount=${prices.toString()}`
       try {
         const response = await axios.get(exchangerootendpoint);
         let toamount = response.data;
-        let result = toamount?.toTokenAmount;
+        let amountformat = ethers.utils.formatEther(toamount.toTokenAmount);
+        let result = Math.round(amountformat);
         setreceivingamount(result)
       } catch (exchangerootendpoint) {
         let error = exchangerootendpoint.response.data.description;
