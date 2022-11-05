@@ -3,6 +3,7 @@ import BNBLogo from '../../images/swap/btc.svg'
 import ReceiveLogo from '../../images/swap/receive.svg'
 import SwitchIcon from '../../images/swap/switch.svg'
 import { CheckAllowance, ApproveFunction, SwapTokens } from './functions'
+import { Toaster } from 'react-hot-toast';
 import axios from "axios";
 import { ethers } from "ethers";
 import "./swap.scss"
@@ -15,6 +16,7 @@ const Swap = ({ useraddress, provider, wallet }) => {
   const [swaptokentwo, SwapTokentwo] = React.useState("none");
   const [swaptokenone, SwapTokenone] = React.useState("");
   const [balancetoken, setBalanceToken] = React.useState(0);
+  const [token, setToken] = React.useState("SHIH");
   const [userbalance, setUserBalance] = React.useState(0);
   const [tokenfromaddress, settokenfromaddress] = React.useState("0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c");
   const [tokentoaddress, settokentoaddress] = React.useState("0x1e8150ea46E2A7FBB795459198fBB4B35715196c");
@@ -30,7 +32,6 @@ const Swap = ({ useraddress, provider, wallet }) => {
 
   React.useEffect(() => {
     Wallet()
-
   }, []);
 
   const Wallet = async () => {
@@ -64,39 +65,40 @@ const Swap = ({ useraddress, provider, wallet }) => {
 
 
   const Tokenvalue = async (props) => {
-    if (amount > userbalance) {
-      setError("Insufficient BNB balance")
-    }
-    else {
-      try {
-        const url = `${process.env.REACT_APP_CORUS_URL}` + `${process.env.REACT_APP_COINMARKET_ENDPOINT}?amount=1&symbol=SHIH`;
-        fetch(url, {
-          method: "GET",
-          withCredentials: true,
-          headers: {
-            "X-CMC_PRO_API_KEY": "79da1075-a7f3-495e-8285-774af970f7bc",
-            "Content-Type": "application/json",
-            "X-Requested-With": "XMLHttpRequest"
-          }
+    // if (amount > userbalance) {
+    //   setError("Insufficient BNB balance")
+    //}
+    // else {
+    try {
+      const url = `${process.env.REACT_APP_CORUS_URL}` + `${process.env.REACT_APP_COINMARKET_ENDPOINT}?amount=1&symbol=${token}`;
+      fetch(url, {
+        method: "GET",
+        withCredentials: true,
+        headers: {
+          "X-CMC_PRO_API_KEY": "79da1075-a7f3-495e-8285-774af970f7bc",
+          "Content-Type": "application/json",
+          "X-Requested-With": "XMLHttpRequest"
+        }
+      })
+        .then(resp => resp.json())
+        .then(function (data) {
+          let onetoken = data.data[0].quote.USD.price;
+          let total = props / onetoken;
+          setreceivingamount(total)
         })
-          .then(resp => resp.json())
-          .then(function (data) {
-            let onetoken = data.data[0].quote.USD.price;
-            let total = props / onetoken;
-            setreceivingamount(total)
-          })
-          .catch(function (error) {
-            console.log(error);
-          });
-      } catch (exchangerootendpoint) {
-        let error = exchangerootendpoint.response.data.description;
-        setError(error)
-      }
+        .catch(function (error) {
+          console.log(error);
+        });
+    } catch (exchangerootendpoint) {
+      let error = exchangerootendpoint.response.data.description;
+      setError(error)
     }
+    // }
   }
 
   return (
     <div className='landing'>
+      <Toaster />
       <div className='stak_box'>
         <div className='stak_heading'>
           <h2>Swapping</h2>
@@ -106,12 +108,12 @@ const Swap = ({ useraddress, provider, wallet }) => {
         <div className='stak_body' id="section-one" style={{ display: `${swaptokenone}` }}>
           <div className="input1">
             <input placeholder='Enter Amount'
-              onChange={(e) => { setAmount(e.target.value); Tokenvalue(e.target.value) }} className="form-field" type="text" />
+              onChange={(e) => { setAmount(e.target.value); Tokenvalue(e.target.value); setToken("SHIH") }} className="form-field" type="text" />
             <div className='maxToken'>
               <img src={BNBLogo} alt="BNB Logo" width="100%" />
             </div>
           </div>
-          <div onClick={() => { setreceivingamount(""); setAmount(""); SwapTokentwo(""); SwapTokenone("none"); settokenfromaddress("0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c"); settokentoaddress("0x1e8150ea46E2A7FBB795459198fBB4B35715196c") }} className="switciconlogo">
+          <div onClick={() => { setreceivingamount(""); setAmount(""); setToken("BNB"); SwapTokentwo(""); SwapTokenone("none"); settokenfromaddress("0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c"); settokentoaddress("0x1e8150ea46E2A7FBB795459198fBB4B35715196c") }} className="switciconlogo">
             <img src={SwitchIcon} alt="Switch Icon" />
           </div>
 
@@ -135,12 +137,12 @@ const Swap = ({ useraddress, provider, wallet }) => {
         <div className='stak_body' id="section-two" style={{ display: `${swaptokentwo}` }}>
           <div className="input1">
             <input placeholder='Enter Amount'
-              onChange={(e) => { Tokenvalue(e.target.value) }} className="form-field" type="text" />
+              onChange={(e) => { setAmount(e.target.value); Tokenvalue(e.target.value); setToken("BNB") }} className="form-field" type="text" />
             <div className='maxToken'>
               <img src={ReceiveLogo} alt="Recever Logo" width="100%" />
             </div>
           </div>
-          <div onClick={() => { setreceivingamount(""); setAmount(""); SwapTokentwo("none"); SwapTokenone(""); settokenfromaddress("0x1e8150ea46E2A7FBB795459198fBB4B35715196c"); settokentoaddress("0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c") }} className="switciconlogo">
+          <div onClick={() => { setreceivingamount(""); setToken("SHIH"); setAmount(""); SwapTokentwo("none"); SwapTokenone(""); settokenfromaddress("0x1e8150ea46E2A7FBB795459198fBB4B35715196c"); settokentoaddress("0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c") }} className="switciconlogo">
             <img src={SwitchIcon} alt="Switch Icon" />
           </div>
           <div className="input1">
