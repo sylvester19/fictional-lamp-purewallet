@@ -55,22 +55,42 @@ const Swap = ({ useraddress, provider, wallet }) => {
 
   const Tokenvalue = async (props) => {
     if (props > userbalance) {
+      const qs = require('qs');
       document.querySelector('#swapBtn').disabled = true;
       setError("Insufficient BNB balance")
+      const prices = props * 1000000000000000000;
+       try {
+        const params = {
+          "sellToken": tokenfromaddress,
+          "buyToken": tokentoaddress,
+          "sellAmount": prices
+        }
+        const response = await fetch(`https://bsc.api.0x.org/swap/v1/price?${qs.stringify(params)}`);
+        const data = await response.json();
+        const price = ethers.utils.formatEther(data.buyAmount);
+        const result = Math.round(price);
+        setreceivingamount(result)
+      } catch (error) {
+        setError("Insufficient BNB balance")
+      }
     }
     else {
+      const qs = require('qs');
       document.querySelector('#swapBtn').disabled = false;
       const prices = props * 1000000000000000000;
-      let exchangerootendpoint = `https://api.1inch.exchange/v4.0/56/quote?fromTokenAddress=${tokenfromaddress}&toTokenAddress=${tokentoaddress}&amount=${prices.toString()}`
       try {
-        const response = await axios.get(exchangerootendpoint);
-        let toamount = response.data;
-        let amountformat = ethers.utils.formatEther(toamount.toTokenAmount);
-        let result = Math.round(amountformat);
+        const params = {
+          "sellToken": tokenfromaddress,
+          "buyToken": tokentoaddress,
+          "sellAmount": prices
+        }
+        const response = await fetch(`https://bsc.api.0x.org/swap/v1/price?${qs.stringify(params)}`);
+        const data = await response.json();
+        const price = ethers.utils.formatEther(data.buyAmount);
+        const result = Math.round(price);
         setreceivingamount(result)
-      } catch (exchangerootendpoint) {
-        let error = exchangerootendpoint.response.data.description;
-        setError(error)
+      } catch (error) {
+        //
       }
     }
   }
