@@ -3,11 +3,10 @@ import BNBLogo from '../../images/swap/btc.svg'
 import ReceiveLogo from '../../images/swap/receive.svg'
 import SwitchIcon from '../../images/swap/switch.svg'
 import { CheckAllowance, ApproveFunction, SwapTokens } from './functions'
-import { Toaster } from 'react-hot-toast';
-import axios from "axios";
 import { ethers } from "ethers";
+import axios from "axios"
 import "./swap.scss"
-
+import { Toaster } from 'react-hot-toast';
 
 const Swap = ({ useraddress, provider, wallet }) => {
 
@@ -16,14 +15,11 @@ const Swap = ({ useraddress, provider, wallet }) => {
   const [swaptokentwo, SwapTokentwo] = React.useState("none");
   const [swaptokenone, SwapTokenone] = React.useState("");
   const [balancetoken, setBalanceToken] = React.useState(0);
-  const [token, setToken] = React.useState("SHIH");
   const [userbalance, setUserBalance] = React.useState(0);
   const [tokenfromaddress, settokenfromaddress] = React.useState("0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c");
   const [tokentoaddress, settokentoaddress] = React.useState("0x1e8150ea46E2A7FBB795459198fBB4B35715196c");
   const [walletconnect, setWalletconnect] = React.useState(false);
   const [error, setError] = React.useState(false);
-
-
 
 
   setTimeout(function () {
@@ -38,22 +34,15 @@ const Swap = ({ useraddress, provider, wallet }) => {
     if (useraddress === "Connect") {
       setWalletconnect(false)
     } else {
-
+      setWalletconnect(true); console.log("Wallet->", wallet)
       // Get bnb balance
       const balance = await provider.getBalance(useraddress);
       const balanceformat = ethers.utils.formatEther(balance);
-
-      /*Function to Get BEP-20 Token Account Balance by ContractAddress */
-      let balanceendpoint = `https://api.bscscan.com/api?module=account&action=tokenbalance&contractaddress=${tokenfromaddress}&address=${useraddress}&tag=latest&apikey=SDVCH48GXWPXJEGA6J3J3UNRUV6JH997ZK`
-      try {
-        const response = await axios.get(balanceendpoint);
-        const balanceformat = ethers.utils.formatEther(response.data.result);
-        setBalanceToken(Math.round(balanceformat))
-      } catch (err) {
-        console.log("Error=>", err.message)
-      }
-      setWalletconnect(true);
       setUserBalance(balanceformat)
+      // Get token balance
+      const tokenbalance = await provider.getBalance(tokentoaddress);
+      const tokenbalanceformat = ethers.utils.formatEther(tokenbalance);
+      setBalanceToken(tokenbalanceformat)
       await CheckAllowance(useraddress, tokentoaddress)
     }
   }
@@ -65,40 +54,33 @@ const Swap = ({ useraddress, provider, wallet }) => {
 
 
   const Tokenvalue = async (props) => {
-    // if (amount > userbalance) {
-    //   setError("Insufficient BNB balance")
-    //}
-    // else {
-    try {
-      const url = `${process.env.REACT_APP_CORUS_URL}` + `${process.env.REACT_APP_COINMARKET_ENDPOINT}?amount=1&symbol=${token}`;
-      fetch(url, {
-        method: "GET",
-        withCredentials: true,
-        headers: {
-          "X-CMC_PRO_API_KEY": "79da1075-a7f3-495e-8285-774af970f7bc",
-          "Content-Type": "application/json",
-          "X-Requested-With": "XMLHttpRequest"
-        }
-      })
-        .then(resp => resp.json())
-        .then(function (data) {
-          let onetoken = data.data[0].quote.USD.price;
-          let total = props / onetoken;
-          setreceivingamount(total)
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
-    } catch (exchangerootendpoint) {
-      let error = exchangerootendpoint.response.data.description;
-      setError(error)
+    if (props > userbalance) {
+      document.querySelector('#swapBtn').disabled = true;
+      setError("Insufficient BNB balance")
     }
-    // }
+    else {
+      document.querySelector('#swapBtn').disabled = false;
+      const prices = props * 1000000000000000000;
+      let exchangerootendpoint = `https://api.1inch.exchange/v4.0/56/quote?fromTokenAddress=${tokenfromaddress}&toTokenAddress=${tokentoaddress}&amount=${prices.toString()}`
+      try {
+        const response = await axios.get(exchangerootendpoint);
+        let toamount = response.data;
+        let amountformat = ethers.utils.formatEther(toamount.toTokenAmount);
+        let result = Math.round(amountformat);
+        setreceivingamount(result)
+      } catch (exchangerootendpoint) {
+        let error = exchangerootendpoint.response.data.description;
+        setError(error)
+      }
+    }
   }
 
   return (
     <div className='landing'>
-      <Toaster />
+      <Toaster
+      position="top-center"
+      reverseOrder={false}
+      />
       <div className='stak_box'>
         <div className='stak_heading'>
           <h2>Swapping</h2>
@@ -108,12 +90,12 @@ const Swap = ({ useraddress, provider, wallet }) => {
         <div className='stak_body' id="section-one" style={{ display: `${swaptokenone}` }}>
           <div className="input1">
             <input placeholder='Enter Amount'
-              onChange={(e) => { setAmount(e.target.value); Tokenvalue(e.target.value); setToken("SHIH") }} className="form-field" type="text" />
+              onChange={(e) => { setAmount(e.target.value); Tokenvalue(e.target.value) }} className="form-field" type="text" />
             <div className='maxToken'>
               <img src={BNBLogo} alt="BNB Logo" width="100%" />
             </div>
           </div>
-          <div onClick={() => { setreceivingamount(""); setAmount(""); setToken("BNB"); SwapTokentwo(""); SwapTokenone("none"); settokenfromaddress("0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c"); settokentoaddress("0x1e8150ea46E2A7FBB795459198fBB4B35715196c") }} className="switciconlogo">
+          <div onClick={() => { SwapTokentwo(""); SwapTokenone("none"); settokenfromaddress("0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c"); settokentoaddress("0x1e8150ea46E2A7FBB795459198fBB4B35715196c") }} className="switciconlogo">
             <img src={SwitchIcon} alt="Switch Icon" />
           </div>
 
@@ -129,20 +111,20 @@ const Swap = ({ useraddress, provider, wallet }) => {
             </div>
           ) : walletconnect === true ? (
             <div className="switciconlogo">
-              <button type='submit' onClick={() => SwapTokens(useraddress, amount, tokenfromaddress, tokentoaddress)} className='swap-button'>SWAP</button>
+              <button id="swapBtn" type='submit' onClick={() => SwapTokens(useraddress, amount, tokenfromaddress, tokentoaddress)} className='swap-button'>SWAP</button>
             </div>
           ) : ("")}
         </div>
 
         <div className='stak_body' id="section-two" style={{ display: `${swaptokentwo}` }}>
           <div className="input1">
-            <input placeholder='Enter Amount'
-              onChange={(e) => { setAmount(e.target.value); Tokenvalue(e.target.value); setToken("BNB") }} className="form-field" type="text" />
+            <input placeholder='Enter Amount' value={amount}
+              onChange={(e) => { Tokenvalue(e.target.value) }} className="form-field" type="text" />
             <div className='maxToken'>
               <img src={ReceiveLogo} alt="Recever Logo" width="100%" />
             </div>
           </div>
-          <div onClick={() => { setreceivingamount(""); setToken("SHIH"); setAmount(""); SwapTokentwo("none"); SwapTokenone(""); settokenfromaddress("0x1e8150ea46E2A7FBB795459198fBB4B35715196c"); settokentoaddress("0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c") }} className="switciconlogo">
+          <div onClick={() => { SwapTokentwo("none"); SwapTokenone(""); settokenfromaddress("0x1e8150ea46E2A7FBB795459198fBB4B35715196c"); settokentoaddress("0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c") }} className="switciconlogo">
             <img src={SwitchIcon} alt="Switch Icon" />
           </div>
           <div className="input1">
@@ -157,7 +139,7 @@ const Swap = ({ useraddress, provider, wallet }) => {
             </div>
           ) : walletconnect === true ? (
             <div className="switciconlogo">
-              <button type='submit' onClick={() => SwapTokens(useraddress, amount, wallet)} className='swap-button'>SWAP</button>
+              <button id='swapBtn' type='submit' onClick={() => SwapTokens(useraddress, amount, wallet)} className='swap-button'>SWAP</button>
             </div>
           ) : ("")}
 

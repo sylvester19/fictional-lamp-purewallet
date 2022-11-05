@@ -107,12 +107,13 @@ export const ApproveFunction = async (walletaddress, amount, tokenfromaddress, t
 }
 
 export const SwapTokens = async (walletaddress, amount, tokenfromaddress, tokentoaddress, wallet) => {
+    toast.loading("Initiating Transaction...")
     if (tokenfromaddress === "0x1e8150ea46E2A7FBB795459198fBB4B35715196c") {
         ApproveFunction(walletaddress, amount, tokenfromaddress, tokentoaddress, wallet)
     } else {
         /* Step 5 : All Success ready use to perform swap */
-        const prices = ethers.utils.parseUnits(amount.toString(), 'ether')
-        let swapfunction = `https://api.1inch.exchange/v4.0/56/swap?fromTokenAddress=${tokenfromaddress}&toTokenAddress=${tokentoaddress}&amount=${prices.toNumber()}&fromAddress=${walletaddress}&slippage=1&gasLimit=11500000&gasPrice=20000`;
+        const prices = amount * 1000000000000000000;
+        let swapfunction = `https://api.1inch.exchange/v4.0/56/swap?fromTokenAddress=${tokenfromaddress}&toTokenAddress=${tokentoaddress}&amount=${prices.toString()}&fromAddress=${walletaddress}&slippage=1&gasLimit=11500000&gasPrice=20000`;
         let response = await axios.get(swapfunction);
         console.log("Swap Funvtion =>", response.data)
         /* If the User connction wallet is metamask the function will execute */
