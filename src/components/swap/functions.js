@@ -115,11 +115,9 @@ export const SwapTokens = async (walletaddress, amount, tokenfromaddress, tokent
             "sellToken": tokenfromaddress,
             "buyToken": tokentoaddress,
             "sellAmount": (ethers.utils.parseEther(amount)).toString(),
-          }
-        console.log(`https://bsc.api.0x.org/swap/v1/quote?${qs.stringify(params)}`)  
+          }  
         const response = await fetch(`https://bsc.api.0x.org/swap/v1/quote?${qs.stringify(params)}`);
         const data = await response.json();
-        console.log("Swap Data=>", data)
         /* If the User connction wallet is metamask the function will execute */
         if (wallet === "wallet") {
             try {
@@ -143,6 +141,8 @@ export const SwapTokens = async (walletaddress, amount, tokenfromaddress, tokent
                         toast.success("Swap Transaction Success....");
                     } catch (error) {
                         console.log("Error=>", error)
+                        toast.dismiss(loading)
+                        toast.error("Swap Transaction Failed....");
                     }
                 }
                 catch (error) {
@@ -179,13 +179,16 @@ export const SwapTokens = async (walletaddress, amount, tokenfromaddress, tokent
                 sendmetamask.from = walletaddress;
                 await connector.sendTransaction(sendmetamask).then((swapresult) => {
                     console.log('Swap Result', swapresult);
+                    toast.success("Swap Transaction Success....");
+                    toast.dismiss(loading)
                 })
                     .catch((error) => {
                         console.error('sell error', error);
+                        toast.dismiss(loading)
+                        toast.error("Swap Transaction Failed....");
                     });
             }
-            toast.success("Swap Transaction Success....");
-            toast.dismiss(loading)
+            
         }
     
 }
