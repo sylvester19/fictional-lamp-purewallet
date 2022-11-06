@@ -6,7 +6,7 @@ import { CheckAllowance, ApproveFunction, SwapTokens } from './functions'
 import { ethers } from "ethers";
 import axios from "axios"
 import "./swap.scss"
-import { Toaster } from 'react-hot-toast';
+import toast, { Toaster } from 'react-hot-toast';
 
 const Swap = ({ useraddress, provider, wallet }) => {
 
@@ -35,26 +35,33 @@ const Swap = ({ useraddress, provider, wallet }) => {
     if (useraddress === "Connect") {
       setWalletconnect(false)
     } else {
+      toast.dismiss();
       setWalletconnect(true); console.log("Wallet->", wallet)
-      // Get bnb balance
       const balance = await provider.getBalance(useraddress);
       const balanceformat = ethers.utils.formatEther(balance);
+      let balanceendpoint = `https://api.bscscan.com/api?module=account&action=tokenbalance&contractaddress=0x1e8150ea46E2A7FBB795459198fBB4B35715196c&address=${useraddress}&tag=latest&apikey=SDVCH48GXWPXJEGA6J3J3UNRUV6JH997ZK`
+      try {
+        const response = await axios.get(balanceendpoint);
+        const balanceformat = ethers.utils.formatEther(response.data.result);
+        setBalanceToken(Math.round(balanceformat))
+      } catch (err) {
+        console.log("Error=>", err.message)
+      }
+      setWalletconnect(true);
       setUserBalance(balanceformat)
-      // Get token balance
-      const tokenbalance = await provider.getBalance(tokentoaddress);
-      const tokenbalanceformat = ethers.utils.formatEther(tokenbalance);
-      setBalanceToken(tokenbalanceformat)
       await CheckAllowance(useraddress, tokentoaddress)
     }
   }
 
 
   const Connectwallet = async () => {
+    toast.loading("Connecting Wallet...")
     document.getElementById("walletconnect").click();
   }
 
 
   const Tokenvalue = async (props) => {
+    if (walletconnect === true) {
     if (props > userbalance) {
       const qs = require('qs');
       document.querySelector('#swapBtn').disabled = true;
@@ -94,6 +101,10 @@ const Swap = ({ useraddress, provider, wallet }) => {
         //
       }
     }
+  }
+  else {
+    toast.error("Please connect wallet")
+  }
   }
 
   return (
@@ -176,7 +187,7 @@ const Swap = ({ useraddress, provider, wallet }) => {
         <div className='stak_body_footer'>
           <p>Your BNB Balance <span className='stack_value'>{userbalance} BNB</span></p>
           <p>Your PURE Balance <span className='stack_value'>{balancetoken} PURE</span></p>
-          <p>PURE/BNB Rate <span className='stack_value'>10000000 PURE/BNB</span></p>
+          <p>PURE/BNB Rate <span className='stack_value'>0 PURE/BNB</span></p>
         </div>
       </div>
     </div >
