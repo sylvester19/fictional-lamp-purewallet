@@ -20,6 +20,7 @@ const Swap = ({ useraddress, provider, wallet }) => {
   const [tokentoaddress, settokentoaddress] = React.useState("0x1e8150ea46E2A7FBB795459198fBB4B35715196c");
   const [walletconnect, setWalletconnect] = React.useState(false);
   const [error, setError] = React.useState(false);
+  const [token, setToken] = React.useState("SHIH");
 
 
   setTimeout(function () {
@@ -115,7 +116,7 @@ const Swap = ({ useraddress, provider, wallet }) => {
               <img src={BNBLogo} alt="BNB Logo" width="100%" />
             </div>
           </div>
-          <div onClick={() => { SwapTokentwo(""); SwapTokenone("none"); settokenfromaddress("0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c"); settokentoaddress("0x1e8150ea46E2A7FBB795459198fBB4B35715196c") }} className="switciconlogo">
+          <div onClick={() => { setreceivingamount(""); setAmount(""); setToken("BNB"); SwapTokentwo(""); SwapTokenone("none"); settokenfromaddress("0x1e8150ea46E2A7FBB795459198fBB4B35715196c"); settokentoaddress("0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c") }} className="switciconlogo">
             <img src={SwitchIcon} alt="Switch Icon" />
           </div>
 
@@ -138,13 +139,13 @@ const Swap = ({ useraddress, provider, wallet }) => {
 
         <div className='stak_body' id="section-two" style={{ display: `${swaptokentwo}` }}>
           <div className="input1">
-            <input placeholder='Enter Amount' value={amount}
+            <input placeholder='Enter Amount' defaultValue={amount}
               onChange={(e) => { Tokenvalue(e.target.value) }} className="form-field" type="text" />
             <div className='maxToken'>
               <img src={ReceiveLogo} alt="Recever Logo" width="100%" />
             </div>
           </div>
-          <div onClick={() => { SwapTokentwo("none"); SwapTokenone(""); settokenfromaddress("0x1e8150ea46E2A7FBB795459198fBB4B35715196c"); settokentoaddress("0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c") }} className="switciconlogo">
+          <div onClick={() => {  setreceivingamount(""); setToken("SHIH"); setAmount(""); SwapTokentwo("none"); SwapTokenone(""); settokenfromaddress("0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c"); settokentoaddress("0x1e8150ea46E2A7FBB795459198fBB4B35715196c") }} className="switciconlogo">
             <img src={SwitchIcon} alt="Switch Icon" />
           </div>
           <div className="input1">
