@@ -1,5 +1,5 @@
 import axios from "axios";
-import { ethers } from "ethers";
+import { ethers, providers } from "ethers";
 import WalletConnect from "@walletconnect/client";
 import QRCodeModal from "@walletconnect/qrcode-modal";
 import toast from 'react-hot-toast';
@@ -27,7 +27,7 @@ export const CheckAllowance = async (walletaddress, tokentoaddress) => {
 
 export const ApproveFunction = async (walletaddress, amount, tokenfromaddress, tokentoaddress, wallet) => {
     /* Step 3 : If necessary, give approval for 1inch router to spend source token */
-    let loading = toast.loading("Please Wait until the contract get's approved")
+    let loading = toast.loading("Please Wait until the contract gets approved")
     const prices = ethers.utils.parseUnits(amount.toString(), 'ether')
     let approvalendpoint = `https://api.1inch.exchange/v4.0/56/approve/transaction?tokenAddress=${tokentoaddress}&amount=${prices.toNumber()}`
     try {
@@ -107,21 +107,26 @@ export const ApproveFunction = async (walletaddress, amount, tokenfromaddress, t
 }
 
 export const SwapTokens = async (walletaddress, amount, tokenfromaddress, tokentoaddress, wallet) => {
+    const qs = require('qs');
     toast.loading("Initiating Transaction...")
-    if (tokenfromaddress === "0x1e8150ea46E2A7FBB795459198fBB4B35715196c") {
-        ApproveFunction(walletaddress, amount, tokenfromaddress, tokentoaddress, wallet)
-    } else {
+    
         /* Step 5 : All Success ready use to perform swap */
-        const prices = amount * 1000000000000000000;
-        let swapfunction = `https://api.1inch.exchange/v4.0/56/swap?fromTokenAddress=${tokenfromaddress}&toTokenAddress=${tokentoaddress}&amount=${prices.toString()}&fromAddress=${walletaddress}&slippage=1&gasLimit=11500000&gasPrice=20000`;
-        let response = await axios.get(swapfunction);
-        console.log("Swap Funvtion =>", response.data)
+        const params = {
+            "sellToken": tokenfromaddress,
+            "buyToken": tokentoaddress,
+            "sellAmount": (ethers.utils.parseEther(amount)).toString(),
+          }
+        console.log(`https://bsc.api.0x.org/swap/v1/quote?${qs.stringify(params)}`)  
+        const response = await fetch(`https://bsc.api.0x.org/swap/v1/quote?${qs.stringify(params)}`);
+        const data = await response.json();
+        console.log("Swap Data=>", data)
         /* If the User connction wallet is metamask the function will execute */
         if (wallet === "wallet") {
             try {
-                const sendmetamask = response.data;
+                const sendmetamask = data;
                 try {
-                    let loading = toast.loading("Please Wait until the contract get's approved")
+                    toast.dismiss()
+                    let loading = toast.loading("Please Wait until the contract gets approved")
                     const { ethereum } = window;
                     await ethereum.request({ method: "eth_requestAccounts" });
                     const accounts = await ethereum.request({ method: "eth_accounts" });
@@ -149,8 +154,9 @@ export const SwapTokens = async (walletaddress, amount, tokenfromaddress, tokent
             }
         } else {
             /*If the wallet not equal to metamask it goes to wallet connect function */
-            let loading = toast.loading("Please Wait until the contract get's approved")
-            const sendmetamask = response.data;
+            toast.dismiss()
+            let loading = toast.loading("Please Wait until the contract gets approved")
+            const sendmetamask = data;
             const connector = new WalletConnect({
                 bridge: "https://bridge.walletconnect.org", // Required
                 qrcodeModal: QRCodeModal,
@@ -171,7 +177,7 @@ export const SwapTokens = async (walletaddress, amount, tokenfromaddress, tokent
             }
             else {
                 sendmetamask.from = walletaddress;
-                connector.sendTransaction(sendmetamask).then((swapresult) => {
+                await connector.sendTransaction(sendmetamask).then((swapresult) => {
                     console.log('Swap Result', swapresult);
                 })
                     .catch((error) => {
@@ -181,7 +187,7 @@ export const SwapTokens = async (walletaddress, amount, tokenfromaddress, tokent
             toast.success("Swap Transaction Success....");
             toast.dismiss(loading)
         }
-    }
+    
 }
 
 

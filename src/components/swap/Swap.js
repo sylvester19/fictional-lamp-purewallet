@@ -62,21 +62,21 @@ const Swap = ({ useraddress, provider, wallet }) => {
 
   const Tokenvalue = async (props) => {
     if (walletconnect === true) {
+      if (tokenfromaddress === "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c") {
     if (props > userbalance) {
       const qs = require('qs');
       document.querySelector('#swapBtn').disabled = true;
       setError("Insufficient BNB balance")
-      const prices = props * 1000000000000000000;
        try {
         const params = {
           "sellToken": tokenfromaddress,
           "buyToken": tokentoaddress,
-          "sellAmount": prices
+          "sellAmount": (ethers.utils.parseEther(props)).toString(),
         }
         const response = await fetch(`https://bsc.api.0x.org/swap/v1/price?${qs.stringify(params)}`);
         const data = await response.json();
         const price = ethers.utils.formatEther(data.buyAmount);
-        const result = Math.round(price);
+        const result = Math.round(price * 100000) / 100000;
         setreceivingamount(result)
       } catch (error) {
         setError("Insufficient BNB balance")
@@ -85,12 +85,11 @@ const Swap = ({ useraddress, provider, wallet }) => {
     else {
       const qs = require('qs');
       document.querySelector('#swapBtn').disabled = false;
-      const prices = props * 1000000000000000000;
       try {
         const params = {
           "sellToken": tokenfromaddress,
           "buyToken": tokentoaddress,
-          "sellAmount": prices
+          "sellAmount": (ethers.utils.parseEther(props)).toString(),
         }
         const response = await fetch(`https://bsc.api.0x.org/swap/v1/price?${qs.stringify(params)}`);
         const data = await response.json();
@@ -101,6 +100,50 @@ const Swap = ({ useraddress, provider, wallet }) => {
         //
       }
     }
+  }
+  else {
+    if (props > balancetoken) {
+      const qs = require('qs');
+      document.querySelector('#swapBtn').disabled = true;
+      setError("Insufficient PURE balance")
+       try {
+        const params = {
+          "sellToken": tokenfromaddress,
+          "buyToken": tokentoaddress,
+          "sellAmount": (ethers.utils.parseEther(props)).toString(),
+        }
+        const response = await fetch(`https://bsc.api.0x.org/swap/v1/price?${qs.stringify(params)}`);
+        const data = await response.json();
+        const price = ethers.utils.formatEther(data.buyAmount);
+        const result = Math.round(price * 100000) / 100000;
+        setreceivingamount(result)
+        document.querySelector('#swapBtn1').disabled = true;
+      } catch (error) {
+        setError("Insufficient PURE balance")
+      }
+    }
+    else {
+      const qs = require('qs');
+      document.querySelector('#swapBtn').disabled = false;
+      try {
+        const params = {
+          "sellToken": tokenfromaddress,
+          "buyToken": tokentoaddress,
+          "sellAmount": (ethers.utils.parseEther(props)).toString(),
+        }
+        const response = await fetch(`https://bsc.api.0x.org/swap/v1/price?${qs.stringify(params)}`);
+        const data = await response.json();
+        const price = ethers.utils.formatEther(data.buyAmount);
+        const result = Math.round(price);
+        setreceivingamount(result)
+      } catch (error) {
+        //
+      }
+    }
+  }
+  setTimeout(function () {
+  setError(false)
+  }, 3000);
   }
   else {
     toast.error("Please connect wallet")
@@ -150,8 +193,8 @@ const Swap = ({ useraddress, provider, wallet }) => {
 
         <div className='stak_body' id="section-two" style={{ display: `${swaptokentwo}` }}>
           <div className="input1">
-            <input placeholder='Enter Amount' defaultValue={amount}
-              onChange={(e) => { Tokenvalue(e.target.value) }} className="form-field" type="text" />
+            <input placeholder='Enter Amount'
+              onChange={(e) => { setAmount(e.target.value); Tokenvalue(e.target.value) }} className="form-field" type="text" />
             <div className='maxToken'>
               <img src={ReceiveLogo} alt="Recever Logo" width="100%" />
             </div>
@@ -171,7 +214,7 @@ const Swap = ({ useraddress, provider, wallet }) => {
             </div>
           ) : walletconnect === true ? (
             <div className="switciconlogo">
-              <button id='swapBtn' type='submit' onClick={() => SwapTokens(useraddress, amount, wallet)} className='swap-button'>SWAP</button>
+              <button id='swapBtn1' type='submit' onClick={() => SwapTokens(useraddress, amount, tokenfromaddress, tokentoaddress)} className='swap-button'>SWAP</button>
             </div>
           ) : ("")}
 
